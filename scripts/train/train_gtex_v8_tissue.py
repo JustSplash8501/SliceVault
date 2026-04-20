@@ -16,7 +16,7 @@ from splicevault.classify import predict_samples, save_model, train_classifier
 PROJECTS = ["BLADDER", "CERVIX_UTERI", "KIDNEY"]
 TOP_PER_TISSUE = 400
 BASE = Path("data/raw/recount3/gtex_v8/files")
-OUT = Path("data/processed/realworld")
+OUT = Path("data/processed/gtex_v8_tissue")
 OUT.mkdir(parents=True, exist_ok=True)
 
 
@@ -152,7 +152,7 @@ train_labels = labels_s.loc[train_samples]
 
 print("Training classifier on train split only...")
 clf = train_classifier(train_matrix, train_labels, model_type="logreg")
-save_model(clf, "models/splicevault_realworld_model.joblib", "models/splicevault_realworld_model.h5")
+save_model(clf, "models/splicevault_gtex_v8_tissue_model.joblib", "models/splicevault_gtex_v8_tissue_model.h5")
 
 
 def eval_split(name: str, split_samples: list[str]) -> dict:
@@ -179,4 +179,4 @@ metrics = {
 (OUT / "metrics.json").write_text(json.dumps(metrics, indent=2))
 print(json.dumps({k: metrics[k] for k in ["train", "val", "test"]}, indent=2))
 print("Saved metrics to", OUT / "metrics.json")
-print("Saved model to models/splicevault_realworld_model.joblib")
+print("Saved model to models/splicevault_gtex_v8_tissue_model.joblib")

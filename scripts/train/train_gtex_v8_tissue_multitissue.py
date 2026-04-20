@@ -15,7 +15,7 @@ from splicevault.classify import predict_samples, save_model, train_classifier
 
 BASE = Path("data/raw/recount3/gtex_v8/files")
 META_PATH = Path("data/raw/recount3/gtex_v8/recount3_raw_project_files_with_default_annotation.csv")
-OUT = Path("data/processed/realworld_multitissue_noleak")
+OUT = Path("data/processed/gtex_v8_tissue_multitissue")
 OUT.mkdir(parents=True, exist_ok=True)
 
 # Keep features manageable while preserving tissue signal and runtime.
@@ -213,8 +213,8 @@ def main() -> None:
     clf = train_classifier(train_matrix, train_labels, model_type="logreg")
     save_model(
         clf,
-        "models/splicevault_realworld_multitissue_model.joblib",
-        "models/splicevault_realworld_multitissue_model.h5",
+        "models/splicevault_gtex_v8_tissue_multitissue_model.joblib",
+        "models/splicevault_gtex_v8_tissue_multitissue_model.h5",
     )
 
     def evaluate(samples: list[str]) -> dict:
@@ -242,7 +242,7 @@ def main() -> None:
     (OUT / "metrics.json").write_text(json.dumps(metrics, indent=2))
 
     print(json.dumps({"train": metrics["train"], "val": metrics["val"], "test": metrics["test"]}, indent=2))
-    print("Saved model: models/splicevault_realworld_multitissue_model.joblib")
+    print("Saved model: models/splicevault_gtex_v8_tissue_multitissue_model.joblib")
     print(f"Saved splits/metrics under: {OUT}")
 
 

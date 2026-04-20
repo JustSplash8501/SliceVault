@@ -68,7 +68,7 @@ Notes:
 Run the multi-tissue training pipeline:
 
 ```bash
-PYTHONPATH=. python3 scripts/train/train_realworld_multitissue_noleak.py
+PYTHONPATH=. python3 scripts/train/train_gtex_v8_tissue_multitissue.py
 ```
 
 What this script does:
@@ -130,35 +130,31 @@ What this script does:
 - Multi-tissue run currently includes 10 tissues with complete junction assets:
   - `ADIPOSE_TISSUE`, `BLOOD`, `HEART`, `MUSCLE`, `COLON`, `THYROID`, `LUNG`, `KIDNEY`, `BLADDER`, `CERVIX_UTERI`
 - Representative holdout performance from latest run is stored in:
-  - `data/processed/realworld_multitissue_noleak/metrics.json`
+  - `data/processed/gtex_v8_tissue_multitissue/metrics.json`
 
 ### Training Pipeline Diagram
 
 ```mermaid
 flowchart TD
-    A["recount3 GTEx (MM/RR/ID per tissue)"] --> B["Parse junction metadata (coord keys)"]
-    B --> C["Detect complete tissues"]
-    C --> D["Stratified split (train/val/test)"]
-    D --> E["Train-only feature selection (top variance per tissue)"]
-    E --> F["Union feature set across tissues"]
-    F --> G["Build sample x feature matrix (sparse slice -> dense)"]
-    G --> H["Normalize per sample (CPM-like) + log1p"]
-    H --> I["Train classifier (impute + scale + multinomial logistic regression)"]
-    I --> J["Evaluate on val/test (accuracy, macro-F1, per-class report)"]
-    I --> K["Save model artifacts (.joblib + .h5)"]
-    J --> L["Write reproducibility outputs (splits.json, metrics.json, feature parquet)"]
+    A["GTEx junction inputs (MM/RR/ID)"] --> B["Split data (train/val/test)"]
+    B --> C["Train-only feature selection"]
+    C --> D["Matrix build + CPM/log1p normalization"]
+    D --> E["Train model (impute + scale + multinomial LR)"]
+    E --> F["Evaluate (val/test)"]
+    E --> G["Save model (.joblib/.h5)"]
+    F --> H["Save metrics + splits + features"]
 ```
 
 ## Outputs
 
 After training, artifacts are written to:
 
-- Model bundle: `models/splicevault_realworld_multitissue_model.joblib`
-- HDF5 metadata: `models/splicevault_realworld_multitissue_model.h5`
-- Feature matrix: `data/processed/realworld_multitissue_noleak/junction_features.parquet`
-- Labels: `data/processed/realworld_multitissue_noleak/junction_labels.csv`
-- Splits: `data/processed/realworld_multitissue_noleak/splits.json`
-- Metrics: `data/processed/realworld_multitissue_noleak/metrics.json`
+- Model bundle: `models/splicevault_gtex_v8_tissue_multitissue_model.joblib`
+- HDF5 metadata: `models/splicevault_gtex_v8_tissue_multitissue_model.h5`
+- Feature matrix: `data/processed/gtex_v8_tissue_multitissue/junction_features.parquet`
+- Labels: `data/processed/gtex_v8_tissue_multitissue/junction_labels.csv`
+- Splits: `data/processed/gtex_v8_tissue_multitissue/splits.json`
+- Metrics: `data/processed/gtex_v8_tissue_multitissue/metrics.json`
 
 ## Use a Trained Model
 
@@ -167,7 +163,7 @@ Classify from a junction file via CLI:
 ```bash
 splicevault classify \
   --junctions path/to/sample.junc \
-  --model models/splicevault_realworld_multitissue_model.joblib
+  --model models/splicevault_gtex_v8_tissue_multitissue_model.joblib
 ```
 
 Train from an existing matrix/labels pair:

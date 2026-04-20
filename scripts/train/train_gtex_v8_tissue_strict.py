@@ -16,7 +16,7 @@ from splicevault.classify import predict_samples, save_model, train_classifier
 PROJECTS = ["BLADDER", "CERVIX_UTERI", "KIDNEY"]
 TOP_PER_TISSUE = 400
 BASE = Path("data/raw/recount3/gtex_v8/files")
-OUT = Path("data/processed/realworld_noleak")
+OUT = Path("data/processed/gtex_v8_tissue_strict")
 OUT.mkdir(parents=True, exist_ok=True)
 
 
@@ -143,7 +143,7 @@ train_matrix = x_df.loc[train_samples].T
 train_labels = y_s.loc[train_samples]
 
 clf = train_classifier(train_matrix, train_labels, model_type="logreg")
-save_model(clf, "models/splicevault_realworld_model_noleak.joblib", "models/splicevault_realworld_model_noleak.h5")
+save_model(clf, "models/splicevault_gtex_v8_tissue_model_strict.joblib", "models/splicevault_gtex_v8_tissue_model_strict.h5")
 
 
 def eval_split(samples: list[str]) -> dict[str, float | int]:
