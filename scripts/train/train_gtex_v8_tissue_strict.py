@@ -74,7 +74,12 @@ for project in PROJECTS:
 all_samples_arr = np.array(all_samples)
 all_labels_arr = np.array(all_labels)
 idx = np.arange(len(all_samples_arr))
-train_idx, temp_idx = train_test_split(idx, test_size=0.30, stratify=all_labels_arr, random_state=42)
+train_idx, temp_idx = train_test_split(
+    idx,
+    test_size=0.30,
+    stratify=all_labels_arr,
+    random_state=42,
+)
 val_idx, test_idx = train_test_split(
     temp_idx, test_size=0.50, stratify=all_labels_arr[temp_idx], random_state=42
 )
@@ -143,7 +148,11 @@ train_matrix = x_df.loc[train_samples].T
 train_labels = y_s.loc[train_samples]
 
 clf = train_classifier(train_matrix, train_labels, model_type="logreg")
-save_model(clf, "models/splicevault_gtex_v8_tissue_model_strict.joblib", "models/splicevault_gtex_v8_tissue_model_strict.h5")
+save_model(
+    clf,
+    "models/splicevault_gtex_v8_tissue_model_strict.joblib",
+    "models/splicevault_gtex_v8_tissue_model_strict.h5",
+)
 
 
 def eval_split(samples: list[str]) -> dict[str, float | int]:

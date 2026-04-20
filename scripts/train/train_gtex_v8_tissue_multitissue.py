@@ -75,7 +75,7 @@ def main() -> None:
     if len(tissues) < 3:
         raise RuntimeError("Need at least 3 complete tissues to build multiclass splits")
 
-    # Optional: sort by tissue sample count descending using metadata to keep deterministic ordering.
+    # Sort by tissue sample count for deterministic processing order.
     meta = pd.read_csv(META_PATH)
     meta = meta[
         (meta["organism"] == "human")
@@ -241,7 +241,8 @@ def main() -> None:
 
     (OUT / "metrics.json").write_text(json.dumps(metrics, indent=2))
 
-    print(json.dumps({"train": metrics["train"], "val": metrics["val"], "test": metrics["test"]}, indent=2))
+    summary = {"train": metrics["train"], "val": metrics["val"], "test": metrics["test"]}
+    print(json.dumps(summary, indent=2))
     print("Saved model: models/splicevault_gtex_v8_tissue_multitissue_model.joblib")
     print(f"Saved splits/metrics under: {OUT}")
 
