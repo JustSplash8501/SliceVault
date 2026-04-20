@@ -79,6 +79,76 @@ What this script does:
 - Evaluates on train/val/test holdouts
 - Saves model + split/metrics artifacts
 
+## Model Training Methodology (Technical)
+
+### Data source and modality
+
+- Data source: recount3 GTEx v8 tissue projects (`human`, `data_sources/gtex`)
+- Inputs per tissue: junction count matrix (`*.ALL.MM.gz`), junction metadata (`*.ALL.RR.gz`), sample identifiers (`*.ALL.ID.gz`)
+- Unit of learning: **sample-level tissue classification** from junction-derived splicing features
+
+### Feature construction
+
+1. Parse junction coordinates from RR metadata as:
+   - `chromosome:start-end:strand`
+2. Restrict candidate junctions to main chromosomes (`chr*`) for stable genomic signal.
+3. Perform variance-based feature selection **within each tissue on the train split only**:
+   - compute per-junction variance from sparse matrices
+   - keep top `TOP_PER_TISSUE` (currently `200`) junctions per tissue
+   - union selected junctions across tissues into a global feature set
+4. Build dense sample × feature matrix by slicing selected junction rows from each sparse matrix.
+5. Apply per-sample library-size normalization and log transform:
+   - `x_norm = log1p((x / sum(x_sample)) * 1e6)`
+
+### Split strategy and leakage controls
+
+- Split strategy: stratified `70/15/15` train/validation/test over all samples (`random_state=42`)
+- Leakage control: feature selection is executed **after splitting** and uses only train samples
+- Validation/test folds are untouched by both feature ranking and model fitting
+
+### Model and optimization
+
+- Classifier: multinomial logistic regression pipeline (`model_type='logreg'`)
+- Preprocessing in classifier pipeline:
+  - median imputation for missing values
+  - standard scaling
+- Training objective: multi-class tissue discrimination from splice-junction signatures
+
+### Evaluation protocol
+
+- Metrics:
+  - accuracy
+  - macro F1
+  - per-class precision/recall/F1 via `classification_report`
+- Output artifacts:
+  - serialized model (`.joblib`)
+  - HDF5 metadata (`.h5`)
+  - persisted features, labels, splits, and metrics JSON for reproducibility
+
+### Current large-cohort run
+
+- Multi-tissue run currently includes 10 tissues with complete junction assets:
+  - `ADIPOSE_TISSUE`, `BLOOD`, `HEART`, `MUSCLE`, `COLON`, `THYROID`, `LUNG`, `KIDNEY`, `BLADDER`, `CERVIX_UTERI`
+- Representative holdout performance from latest run is stored in:
+  - `data/processed/realworld_multitissue_noleak/metrics.json`
+
+### Training Pipeline Diagram
+
+```mermaid
+flowchart TD
+    A["recount3 GTEx (MM/RR/ID per tissue)"] --> B["Parse junction metadata (coord keys)"]
+    B --> C["Detect complete tissues"]
+    C --> D["Stratified split (train/val/test)"]
+    D --> E["Train-only feature selection (top variance per tissue)"]
+    E --> F["Union feature set across tissues"]
+    F --> G["Build sample x feature matrix (sparse slice -> dense)"]
+    G --> H["Normalize per sample (CPM-like) + log1p"]
+    H --> I["Train classifier (impute + scale + multinomial logistic regression)"]
+    I --> J["Evaluate on val/test (accuracy, macro-F1, per-class report)"]
+    I --> K["Save model artifacts (.joblib + .h5)"]
+    J --> L["Write reproducibility outputs (splits.json, metrics.json, feature parquet)"]
+```
+
 ## Outputs
 
 After training, artifacts are written to:
