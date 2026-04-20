@@ -1,0 +1,47 @@
+SAMPLES = config.get("samples", [])
+JUNCTIONS = config.get("junctions", {})
+LABELS = config.get("labels", "labels.csv")
+
+rule all:
+    input:
+        "results/model/splicevault_model.joblib",
+        "results/signatures/signature_matrix.parquet",
+
+rule psi_matrix:
+    input:
+        lambda wildcards: [JUNCTIONS[s] for s in SAMPLES]
+    output:
+        "results/psi/psi_matrix.parquet"
+    shell:
+        """
+        python -m splicevault.cli build-psi \
+            --junctions {input:q} \
+            --samples {','.join(SAMPLES)} \
+            --out {output}
+        """
+
+rule signatures:
+    input:
+        psi="results/psi/psi_matrix.parquet",
+        labels=LABELS
+    output:
+        "results/signatures/signature_matrix.parquet"
+    run:
+        import pandas as pd
+        from splicevault.signatures import build_signature_matrix, save_signature_matrix
+
+        psi = pd.read_parquet(input.psi)
+        labels = pd.read_csv(input.labels).set_index("sample")["label"]
+        signature, _ = build_signature_matrix(psi, labels)
+        save_signature_matrix(signature, output[0])
+
+rule train:
+    input:
+        matrix="results/signatures/signature_matrix.parquet",
+        labels=LABELS
+    output:
+        "results/model/splicevault_model.joblib"
+    shell:
+        """
+        splicevault train --matrix {input.matrix} --labels {input.labels} --out {output}
+        """

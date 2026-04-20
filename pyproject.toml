@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "splicevault"
+version = "0.1.0"
+description = "Alternative splicing signature classifier for tissue and disease fingerprinting"
+authors = ["SpliceVault Contributors <dev@splicevault.org>"]
+readme = "README.md"
+packages = [{ include = "splicevault" }]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+pandas = "^2.2.2"
+numpy = "^1.26.4"
+scikit-learn = "^1.5.1"
+typer = "^0.12.3"
+loguru = "^0.7.2"
+matplotlib = "^3.9.0"
+umap-learn = "^0.5.6"
+lightgbm = "^4.5.0"
+pyarrow = "^17.0.0"
+h5py = "^3.11.0"
+joblib = "^1.4.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+ruff = "^0.6.3"
+ipykernel = "^6.29.5"
+
+[tool.poetry.scripts]
+splicevault = "splicevault.cli:app"
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["notebooks/*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]
