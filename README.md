@@ -30,7 +30,15 @@ pip install -e .
 
 ## Quick start
 
-### 1) Download GTEx junction assets
+### 1) Use the existing trained model (no retraining required)
+
+```bash
+splicevault classify \
+  --junctions path/to/sample.junc \
+  --model models/splicevault_gtex_v8_tissue_multitissue_model.joblib
+```
+
+### 2) Download GTEx junction assets (optional, for reproducing training)
 
 ```bash
 python3 scripts/data/download_recount3_gtex_v8.py --include jxn_MM,jxn_RR,jxn_ID
@@ -40,18 +48,10 @@ This pulls MatrixMarket counts (`MM`), junction metadata (`RR`), and sample IDs 
 
 `data/raw/recount3/gtex_v8/files/<TISSUE>/`
 
-### 2) Train the multi-tissue model
+### 3) Train the multi-tissue model (optional)
 
 ```bash
 PYTHONPATH=. python3 scripts/train/train_gtex_v8_tissue_multitissue.py
-```
-
-### 3) Use the trained model
-
-```bash
-splicevault classify \
-  --junctions path/to/sample.junc \
-  --model models/splicevault_gtex_v8_tissue_multitissue_model.joblib
 ```
 
 ## How training works
