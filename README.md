@@ -6,9 +6,27 @@ SpliceVault is a Python toolkit for tissue and disease classification using **al
 
 - Core package: `splicevault/`
 - CLI: `splicevault.cli`
-- GTEx/recount3 data download scripts: `scripts/download_*`
-- Leak-aware training pipelines: `scripts/train_realworld_*_noleak.py`
+- GTEx/recount3 data download scripts: `scripts/data/`
+- Leak-aware training pipelines: `scripts/train/`
 - Workflow scaffold: `workflow/Snakefile`
+
+## Repository Layout
+
+```text
+SpliceVault/
+├── splicevault/                 # Python package (PSI, signatures, classify, viz, CLI)
+├── scripts/
+│   ├── data/                    # Data acquisition/downloading helpers
+│   └── train/                   # Train/val/test training pipelines
+├── data/
+│   ├── raw/                     # External raw data (recount3 GTEx files)
+│   └── processed/               # Derived feature matrices, splits, metrics
+├── models/                      # Trained model artifacts (.joblib + .h5)
+├── tests/                       # Pytest suite
+├── notebooks/                   # Example notebook
+├── workflow/                    # Snakemake scaffold
+└── .github/workflows/ci.yml     # CI
+```
 
 ## Installation
 
@@ -38,7 +56,7 @@ curl -L --fail -o data/raw/recount3/gtex_v8/recount3_raw_project_files_with_defa
 Use the downloader to fetch junction assets (`MM`, `RR`, `ID`) for GTEx tissues:
 
 ```bash
-python3 scripts/download_recount3_gtex_v8.py --include jxn_MM,jxn_RR,jxn_ID
+python3 scripts/data/download_recount3_gtex_v8.py --include jxn_MM,jxn_RR,jxn_ID
 ```
 
 Notes:
@@ -50,7 +68,7 @@ Notes:
 Run the multi-tissue training pipeline:
 
 ```bash
-PYTHONPATH=. python3 scripts/train_realworld_multitissue_noleak.py
+PYTHONPATH=. python3 scripts/train/train_realworld_multitissue_noleak.py
 ```
 
 What this script does:

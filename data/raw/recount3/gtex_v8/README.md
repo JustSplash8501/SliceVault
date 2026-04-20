@@ -12,12 +12,12 @@ This directory contains:
 - `files/<TISSUE>/...`: downloaded GTEx tissue files
 
 Downloader script:
-- `scripts/download_recount3_gtex_v8.py`
+- `scripts/data/download_recount3_gtex_v8.py`
 
 Splicing-focused full GTEx (all tissues) download command:
 
 ```bash
-python3 scripts/download_recount3_gtex_v8.py --include jxn_MM,jxn_RR,jxn_ID
+python3 scripts/data/download_recount3_gtex_v8.py --include jxn_MM,jxn_RR,jxn_ID
 ```
 
 Resume-safe: re-running the command continues interrupted transfers via `curl -C -`.
